@@ -268,13 +268,12 @@ void calibSAMD_ADC_withPWM(int pinADC, int pinPWM, int pinAREF_OUT,
   #endif
 
   /*
-    Let's try an alternative: least squares estimation using values measured
-    across the spectrum, but leaving out PERCENT_AT_ENDS on both ends.
-    Assume we are looking for B1 and B2 where each observed ADC value y is
-    mapped to a corrected value x = B1 + B2*y, where B1 = offset, B2 = gain.
-    We have a vector of observed ADC values Y and a corresponding vector of
-    expected (ideal, correct) values X. The parameters B1 and B2 form vector B.
-    The formula for finding B from Y is:
+    We use least squares estimation using values measured across the spectrum,
+    but leaving out PERCENT_AT_ENDS on both ends. Assume we are looking for B1
+    and B2 where each observed ADC value y is mapped to a corrected value x = B1
+    + B2*y, where B1 = offset, B2 = gain. We have a vector of observed ADC
+    values Y and a corresponding vector of expected (ideal, correct) values X.
+    The parameters B1 and B2 form vector B. The formula for finding B from Y is:
         B = inv(Wt W) Wt X
     where W is a 2-column matrix whose second column is Y and whose first column
     is all 1's (see Wikipedia article on linear least squares). Wt is the
@@ -283,6 +282,9 @@ void calibSAMD_ADC_withPWM(int pinADC, int pinPWM, int pinAREF_OUT,
   */
 
   // Read NUM_STEPS_LSE samples between PERCENT_AT_ENDS and 100-PERCENT_AT_ENDS.
+  #if CALIB_ADC_DBG
+  monitor.printf("Read ADC at %d evenly-spaced steps to compute gain and offset error\n", NUM_STEPS_LSE);
+  #endif
   readADCinRange("Results for linear least squares estimate", X, Y,
     NUM_STEPS_LSE, PERCENT_AT_ENDS, 100-PERCENT_AT_ENDS, res, pinPWM, pinADC,
     cfgADCmultSampAvg);
@@ -336,7 +338,8 @@ void calibSAMD_ADC_withPWM(int pinADC, int pinPWM, int pinAREF_OUT,
   monitor.printf("offsetError = %d\n", offsetError);
   #endif
 
-#if 0
+  // Old method is retained here for reference but is disabled.
+  #if 0
 
   // Determine gain error by measuring PERCENT_AT_ENDS and 100-PERCENT_AT_ENDS of
   // reference voltage.
@@ -379,7 +382,8 @@ void calibSAMD_ADC_withPWM(int pinADC, int pinPWM, int pinAREF_OUT,
   monitor.printf("offsetError = %d\n", offsetError);
   #endif
 
-#endif
+  // End of old method.
+  #endif
 
   // Load both the gain and offset error into the ADC.
   ADC->GAINCORR.reg = ADC_GAINCORR_GAINCORR(gainError);

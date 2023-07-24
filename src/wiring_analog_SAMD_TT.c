@@ -5,6 +5,22 @@
   Created by Ted Toal, July 21, 2023, by copying and editing the Arduino SAMD
   file wiring_analog.c.
 
+  Copyright (c) 2014 Arduino LLC.  All right reserved.
+
+  This library is free software; you can redistribute it and/or
+  modify it under the terms of the GNU Lesser General Public
+  License as published by the Free Software Foundation; either
+  version 2.1 of the License, or (at your option) any later version.
+
+  This library is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+  See the GNU Lesser General Public License for more details.
+
+  You should have received a copy of the GNU Lesser General Public
+  License along with this library; if not, write to the Free Software
+  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
   Brief summary of changes to wiring_analog_SAMD_TT.c from wiring_analog.c:
     1. File <wiring_analog_SAMD_TT.h> is provided to declare the .c functions.
     2. Every function in this file has the same name as the original but with
@@ -32,38 +48,30 @@
       analogWriteResolution().
     7. The original analogWrite() function had some problems with regard to
       using a timer for pulse width modulation:
-      - It used a fixed value of 0xFFFF for the waveform period with a TCC timer
-        even though some TCC timers are 16-bit and some are 24-bit and often the
-        user will want to vary the period. The write resolution was not applied
-        to the period value.
-      - On the first call to analogWrite() for a given timer, the timer is
-        initialized and the CC register is written, but not the CCB register.
-        On subsequent calls the timer is not initialized and the CCB register
-        is written. Instead, the initialization should be separate from update,
-        and the user should be able to re-initialize a timer whenever he wants.
+        - Some TCC timers are 16-bit and some are 24-bit and there is no
+          function to tell you how many bits a given pin's timer has.
+
+        - It used a fixed value of 0xFFFF for the waveform period with a TCC
+          timer even though some TCC timers are 16-bit and some are 24-bit.
+
+        - Often the user will want to vary the PWM period but this was not
+          possible.
+
+        -  The write resolution was not applied to the period value.
+
+        - analogWrite() both initialized the timer for PWM operations the first
+          time it was called for each timer AND loaded it with the (fixed) pulse
+          period and on-time values. There was no way to reinitialize the timer.
+
       To solve these issues, these functions were added:
         analogGetResolution_TCC_SAMD_TT(): return the resolution of a TCC.
         analogStartPWM_TCC_SAMD_TT(): initialize a timer for PWM.
-        analogSetPWM_TCC_SAMD_TT(): write on-time and period values to the PWM.
+        analogSetPWM_TCC_SAMD_TT(): write on-time and period values to the PWM,
+          mapping the values for PWM resolution when necessary.
+
       These use uint32_t type for value and period rather than int type.
       The PWM functionality in the analogWrite_SAMD_TT() function remains
       unchanged.
-
-  Copyright (c) 2014 Arduino LLC.  All right reserved.
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License, or (at your option) any later version.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-  See the GNU Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
 #include "Arduino.h"

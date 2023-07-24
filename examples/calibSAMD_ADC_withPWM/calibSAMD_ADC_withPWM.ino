@@ -37,7 +37,7 @@
   Before running this program, read the extensive file header comments in
   calibSAMD_ADC_withPWM.h, set CALIB_ADC_DBG = 1, and optionally set
   CALIB_ADC_SCOPE to a non-zero value and pinDEBUG to a debug pin number there.
-  Then set the PIN_ constants CFG_ADC_MULT_SAMP_AVG below for your system.
+  Then set the PIN_ constants and CFG_ADC_MULT_SAMP_AVG below for your system.
 */
 #include <Arduino.h>
 #include <wiring_private.h>
@@ -70,11 +70,11 @@
 // This is internal hardware-based averaging. It produces more stable ADC values.
 #define CFG_ADC_MULT_SAMP_AVG 6
 
-//*******************************************************************************************
+//******************************************************************************
 // Standard Arduino setup() function.
 //
 // Initialize monitor port, then call calibSAMD_ADC_withPWM().
-//*******************************************************************************************
+//******************************************************************************
 void setup() {
   // Initialize for using the Arduino IDE serial monitor.
   monitor.begin(MONITOR_PORT);
@@ -84,9 +84,9 @@ void setup() {
   calibSAMD_ADC_withPWM(PIN_ADC, PIN_PWM, PIN_AREF_OUT, CFG_ADC_MULT_SAMP_AVG);
 }
 
-//*******************************************************************************************
+//******************************************************************************
 // Standard Arduino loop() function.
-//*******************************************************************************************
+//******************************************************************************
 void loop() {
   delay(1000);
 }

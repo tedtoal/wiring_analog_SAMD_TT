@@ -56,17 +56,16 @@
   This code is customized for use in a SAMD microcomputer, such as in the
   Arduino Nano 33 IoT. It won't work for non-SAMD systems.
 
-  This configures the ADC for 12-bit operation with external voltage reference,
-  and assumes the user uses it that way.
-
   This requires use of the following hardware and ports:
-    1. The ADC and one ADC analog input
-    2. A TCC timer and one digital output that can be driven by the timer
-    3. A digital output that is tied to the AREF input for generating the ADC
-      analog reference voltage in a manner that can be turned on and off.
+    1. The ADC and one ADC analog input (pinADC)
+    2. A TCC timer and one digital output (pinPWM) that can be driven by the timer
+    3. A digital output (pinAREF_OUT) that is tied to the AREF input for
+      generating the ADC analog reference voltage in a manner that can be turned
+      on and off.
+    4. Optional digital output (PIN_DEBUG) used for debugging, disableable.
 
   Circuit wiring:
-   1. Wire a 0.1 uF capacitor between GND and pin pinADC.
+   1. Wire a 0.1 uF capacitor between GND and pinADC.
    2. Wire a 10K ohm resistor between pinADC and pinPWM.
    3. Wire a large (say 100 uF) capacitor between GND and pinAREF_OUT.
    4. Wire pinAREF_OUT to the AREF (external analog reference voltage) pin.
@@ -76,9 +75,6 @@
 
   Alternatively, wire the AREF pin directly to +3.3V and don't use pinAREF_OUT.
   (Delete the code herein that configures and drives pinAREF_OUT).
-
-  I incorporated this hardware into my thermostat system, and the calibration
-  code runs each time the thermostat starts up.
 
   The pins used are defined by pin* arguments to calibSAMD_ADC_withPWM(). These
   are the standard "Arduino pin numbers", which are not really pin numbers at
@@ -113,16 +109,21 @@
   be accessed with ADC->CTRLB.reg, and the PRESCALER field in that register
   can be accessed with ADC->CTRLB.bit.PRESCALER.
 
-  To use this module:
+  I incorporated this hardware into my thermostat system, and the calibration
+  code runs each time the thermostat starts up. To incorporate ADC calibration
+  into your program:
+
     1. Choose pin constants for the pins you wish to use for pinADC, pinPWM,
         and pinAREF_OUT (optional).
-    2. #include <calibSAMD_ADC_withPWM.h> in your program.
-    3. Call calibSAMD_ADC_withPWM() from setup() before using the ADC, passing
-        it the appropriate 'pin' values and other arguments for configuring the
-        calibration operation.
-    4. Wire your system as shown above.
-    5. Compile your program and download it into a SAMD-based microcomputer.
-    6. When calibSAMD_ADC_withPWM() runs, it will compute and load gain and
+    2. Choose a value for cfgADCmultSampAvg, which determines whether or not
+        automatic ADC multi-sampling and averaging is done. It works well and
+        is recommended.
+    3. #include <calibSAMD_ADC_withPWM.h> in your program.
+    4. Call calibSAMD_ADC_withPWM() from setup() before using the ADC, passing
+        it the appropriate 'pin' values and 'cfgADCmultSampAvg'.
+    5. Wire your system as shown above.
+    6. Compile your program and download it into a SAMD-based microcomputer.
+    7. When calibSAMD_ADC_withPWM() runs, it will compute and load gain and
         offset corrections into the ADC. Subsequent ADC reads should be more
         accurate.
 
@@ -160,7 +161,7 @@
 // calling calibSAMD_ADC_withPWM().
 #define CALIB_ADC_DBG 0
 
-// Maximum ADC output value (minimum is 0).
+// Maximum value to read from ADC (minimum is 0).
 #define ADC_MAX 0xFFF
 
 // Number of milliseconds to delay after turning on AREF before the reference
@@ -174,7 +175,8 @@
 #define PWM_STABLE_DELAY 5
 
 // Percentage of ADC range to use, e.g. if this is 10, measure the ADC value at
-// 10% and 90% of reference voltage and compute gain and offset corrections.
+// steps between 10% and 90% of reference voltage and compute gain and offset
+// corrections.
 #define PERCENT_AT_ENDS 10
 
 // Set this to 0 to disable all oscilloscope-related code. Otherwise, set it to
@@ -245,6 +247,13 @@
                               average 2^6 = 64 samples (seems to give good
                               results). This is internal hardware-based
                               averaging. It produces more stable ADC values.
+  @note     Method: 33 evenly-spaced ADC samples are taken with ADC input (from
+            a PWM circuit with capacitor and resistor) between 10% and 90% of
+            the reference voltage of 3.3VDC. Least squares regression is used to
+            fit the best curve to the relationship between the expected and
+            actual ADC values, and the results of that provide an offset and
+            gain value are loaded into the ADC gain and offset correction
+            registers.
 */
 /**************************************************************************/
 extern void calibSAMD_ADC_withPWM(int pinADC = 7, int pinPWM = 4,
