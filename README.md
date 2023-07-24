@@ -87,20 +87,6 @@ Alternatively, wire the AREF pin directly to +3.3V and don't use pinAREF_OUT. Th
 
 The pins used are defined by pin* arguments to calibSAMD_ADC_withPWM(). These are the standard "Arduino pin numbers", which are not really pin numbers at all. A "pin" number is actually an index into table g_APinDescription[], which can be found in SAMD core software file variant.cpp.
 
-### Finding variant.cpp and other system files
-
-Here are some ways to view and get information about system files.
-
-Right-click on "#include <Arduino.h>" in Arduino IDE and choose "Go to Definition" to open the file in the IDE. From there, open WVariant.h, variant.h, and samd.h. In WVariant.h, right-click on "extern const PinDescription g_APinDescription[];" and choose "Go to Definition" to open variant.cpp. From samd.h, open samd21.h, and from there, open samd21g18a.h, and from there open both the instance and component .h files for the peripherals of interest, say adc.h and tcc.h. To open wiring_analog.c, insert a call to analogWrite(), right-click and choose "Go to Definition". In that file, find a call to pinPeripheral and right-click it and choose "Go to Definition" to open wiring_private.c, and look at that function to see what it does. In samd21g18a.h note the definitions of symbols like ADC and DAC (the second definition, not the first). To find the path of an open file, hover over its name in Arduino IDE open tab for that file. Also open wiring_analog_SAMD_TT.cpp and compare to wiring_analog.c.
-
-### SAMD21G18 microprocessor datasheet
-
-The Nana 33 IoT microcomputer uses an Atmel SAMD21G18 microprocessor. You can download the data sheet by going to:
-
-> https://www.microchip.com/en-us/product/ATsamd21g18
-
-and downloading the data sheet PDF (over 1000 pages, daunting!) To use it, study table 7-1 and note how g_APinDescription[] in variant.cpp uses its info. Then, for each peripheral of interest, in the Table of Contents at the top, find the chapter for that peripheral. You can read the details of the peripheral, or go to the "Register Summary" for it, click on registers and read their description. The .h files mentioned above define all registers of all peripherals in a clean easy-to-use manner. E.g., ADC CTRLB register can be accessed with ADC->CTRLB.reg, and the PRESCALER field in that register can be accessed with ADC->CTRLB.bit.PRESCALER.
-
 ### To incorporate ADC calibration into your program
 
 I incorporated this hardware into my thermostat system, and the calibration code runs each time the thermostat starts up. To incorporate ADC calibration into your program:
@@ -139,9 +125,23 @@ You may find through debugging that you need to adjust certain constants:
 
 Most likely, the values already set will work fine, if you use the recommended capacitor and resistor values.
 
-### Example usage in calibSAMD_ADC_withPWM.ino
+### Example in calibSAMD_ADC_withPWM.ino
 
 See the file *calibSAMD_ADC_withPWM.ino* in the library folder's examples subfolder for a program that calls calibSAMD_ADC_withPWM() during its setup() function.
+
+## Finding variant.cpp and other system files
+
+Here are some ways to view and get information about system files.
+
+Right-click on "#include <Arduino.h>" in Arduino IDE and choose "Go to Definition" to open the file in the IDE. From there, open WVariant.h, variant.h, and samd.h. In WVariant.h, right-click on "extern const PinDescription g_APinDescription[];" and choose "Go to Definition" to open variant.cpp. From samd.h, open samd21.h, and from there, open samd21g18a.h, and from there open both the instance and component .h files for the peripherals of interest, say adc.h and tcc.h. To open wiring_analog.c, insert a call to analogWrite(), right-click and choose "Go to Definition". In that file, find a call to pinPeripheral and right-click it and choose "Go to Definition" to open wiring_private.c, and look at that function to see what it does. In samd21g18a.h note the definitions of symbols like ADC and DAC (the second definition, not the first). To find the path of an open file, hover over its name in Arduino IDE open tab for that file. Also open wiring_analog_SAMD_TT.cpp and compare to wiring_analog.c.
+
+## SAMD21G18 microprocessor datasheet
+
+The Nana 33 IoT microcomputer uses an Atmel SAMD21G18 microprocessor. You can download the data sheet by going to:
+
+> https://www.microchip.com/en-us/product/ATsamd21g18
+
+and downloading the data sheet PDF (over 1000 pages, daunting!) To use it, study table 7-1 and note how g_APinDescription[] in variant.cpp uses its info. Then, for each peripheral of interest, in the Table of Contents at the top, find the chapter for that peripheral. You can read the details of the peripheral, or go to the "Register Summary" for it, click on registers and read their description. The .h files mentioned above define all registers of all peripherals in a clean easy-to-use manner. E.g., ADC CTRLB register can be accessed with ADC->CTRLB.reg, and the PRESCALER field in that register can be accessed with ADC->CTRLB.bit.PRESCALER.
 
 ## Contact
 
