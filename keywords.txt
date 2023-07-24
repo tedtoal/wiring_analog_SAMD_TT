@@ -1,0 +1,14 @@
+# Syntax Coloring Map For wiring_analog_SAMD_TT
+
+analogReadResolution_SAMD_TT	KEYWORD1
+analogWriteResolution_SAMD_TT	KEYWORD1
+analogWriteResolution_DAC_SAMD_TT	KEYWORD1
+analogWriteResolution_PWM_SAMD_TT	KEYWORD1
+analogReference_SAMD_TT	KEYWORD1
+analogRead_SAMD_TT	KEYWORD1
+analogRead_disableDACoption_SAMD_TT	KEYWORD1
+analogWrite_SAMD_TT	KEYWORD1
+analogGetResolution_TCC_SAMD_TT	KEYWORD1
+analogStartPWM_TCC_SAMD_TT	KEYWORD1
+analogSetPWM_TCC_SAMD_TT	KEYWORD1
+calibSAMD_ADC_withPWM	KEYWORD1
