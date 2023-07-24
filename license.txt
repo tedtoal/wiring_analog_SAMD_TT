@@ -1,4 +1,4 @@
-(This license file applies to files calibSAMD_ADC_withPWM.cpp and .h)
+(This license file applies to calibSAMD_ADC_withPWM.cpp and .h, and .ino files)
 
 Software License Agreement (BSD License)
 

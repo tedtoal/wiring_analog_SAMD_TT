@@ -2,7 +2,6 @@
   wiring_analog_SAMD_TT.ino - a program to demonstrate functions in files
     wiring_analog_SAMD_TT.h/.cp
   Created by Ted Toal, July 21, 2023
-
   Released into the public domain.
 
   Software License Agreement (BSD License)
