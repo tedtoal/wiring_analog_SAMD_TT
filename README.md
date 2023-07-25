@@ -28,21 +28,21 @@ The changes made to *wiring_analog.c* within *wiring_analog_SAMD_TT.c* are:
 **7.** The original *analogWrite()* function had some problems with regard to using a timer for pulse width modulation:
 
 > Some TCC timers are 16-bit and some are 24-bit and there is no function to tell you how many bits a given pin's timer has.
-
+>
 > It used a fixed value of 0xFFFF for the waveform period with a TCC timer even though some TCC timers are 16-bit and some are 24-bit.
-
+>
 > Often the user will want to vary the PWM period but this was not possible.
-
+>
 > The write resolution was not applied to the period value.
-
+>
 > *analogWrite()* both initialized the timer for PWM operations the first time it was called for each timer AND loaded it with the (fixed) pulse period and on-time values. There was no way to reinitialize the timer.
 
 To solve these issues, these functions were added:
 
 > **analogGetResolution_TCC_SAMD_TT():** return the resolution of a TCC.
-
+>
 > **analogStartPWM_TCC_SAMD_TT():** initialize a timer for PWM.
-
+>
 > **analogSetPWM_TCC_SAMD_TT():** write on-time and period values to the PWM, honoring PWM resolution when needed.
   
 The PWM functionality in the **analogWrite_SAMD_TT()** function remains unchanged from *analogWrite()*.
@@ -122,9 +122,9 @@ I used an oscilloscope to debug this module. If you have a scope, you can enable
 You may find through debugging that you need to adjust certain constants:
 
 > AREF_STABLE_DELAY
-
+>
 > PWM_STABLE_DELAY
-
+>
 > PERCENT_AT_ENDS
 
 Most likely, the values already set will work fine, if you use the recommended capacitor and resistor values.
